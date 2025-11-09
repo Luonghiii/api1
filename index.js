@@ -1,14 +1,59 @@
+// index.js (Cách 2 - Không cần tạo file middleware riêng)
 const express = require("express");
-const cors = require("cors");
 const morgan = require("morgan");
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 app.set("json spaces", 2);
 app.use(morgan("dev"));
 
+// ✅ MIDDLEWARE CORS + PASSWORD cho tất cả /api/*
+app.use("/api/*", (req, res, next) => {
+  // CORS
+  const allowedOrigins = [
+    'https://module-shadow.vercel.app',
+    'http://localhost:3000'
+  ];
+  
+  const origin = req.headers.origin;
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else if (!origin) {
+    return res.status(403).json({ 
+      success: false,
+      error: 'Access denied - No origin header'
+    });
+  } else {
+    return res.status(403).json({ 
+      success: false,
+      error: 'Access denied - Invalid origin'
+    });
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Password');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  // Password check
+  const password = req.headers['x-api-password'];
+  
+  if (password !== '29052007') {
+    return res.status(401).json({ 
+      success: false,
+      error: 'Invalid password'
+    });
+  }
+  
+  next();
+});
+
+// Các routes
 app.use("/api/bluesky", require("./routes/bluesky"));
 app.use("/api/capcut", require("./routes/capcut"));
 app.use("/api/dailymotion", require("./routes/dailymotion"));
