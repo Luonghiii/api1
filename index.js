@@ -1,4 +1,4 @@
-// index.js (Cách 2 - Không cần tạo file middleware riêng)
+// index.js
 const express = require("express");
 const morgan = require("morgan");
 
@@ -8,13 +8,12 @@ app.use(express.json());
 app.set("json spaces", 2);
 app.use(morgan("dev"));
 
-// ✅ MIDDLEWARE CORS + PASSWORD cho tất cả /api/*
+// ✅ MIDDLEWARE với Environment Variables
 app.use("/api/*", (req, res, next) => {
-  // CORS
-  const allowedOrigins = [
-    'https://module-shadow.vercel.app',
-    'http://localhost:3000'
-  ];
+  // 1. CORS - Lấy từ environment variable
+  const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : ['https://module-shadow.vercel.app', 'http://localhost:3000'];
   
   const origin = req.headers.origin;
   
@@ -40,10 +39,11 @@ app.use("/api/*", (req, res, next) => {
     return res.status(200).end();
   }
   
-  // Password check
+  // 2. Password check - Lấy từ environment variable
   const password = req.headers['x-api-password'];
+  const correctPassword = process.env.API_PASSWORD || '29052007';
   
-  if (password !== '29052007') {
+  if (password !== correctPassword) {
     return res.status(401).json({ 
       success: false,
       error: 'Invalid password'
@@ -53,7 +53,7 @@ app.use("/api/*", (req, res, next) => {
   next();
 });
 
-// Các routes
+// Các routes (giữ nguyên)
 app.use("/api/bluesky", require("./routes/bluesky"));
 app.use("/api/capcut", require("./routes/capcut"));
 app.use("/api/dailymotion", require("./routes/dailymotion"));
