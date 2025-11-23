@@ -13,7 +13,7 @@ app.use("/api/*", (req, res, next) => {
   // 1. CORS - Lấy từ environment variable
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['https://module-shadow.vercel.app', 'http://localhost:3000'];
+    : ['https://module-shadow.vercel.app', 'http://localhost:3000', 'https://luonghiii.id.vn'];
   
   const origin = req.headers.origin;
   
