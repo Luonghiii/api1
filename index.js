@@ -39,7 +39,8 @@ app.use("/api/*", (req, res, next) => {
     return res.status(200).end();
   }
   
-  
+  next();
+});
 
 // Các routes (giữ nguyên)
 app.use("/api/bluesky", require("./routes/bluesky"));
