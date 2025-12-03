@@ -39,19 +39,7 @@ app.use("/api/*", (req, res, next) => {
     return res.status(200).end();
   }
   
-  // 2. Password check - Lấy từ environment variable
-  const password = req.headers['x-api-password'];
-  const correctPassword = process.env.API_PASSWORD || '29052007';
   
-  if (password !== correctPassword) {
-    return res.status(401).json({ 
-      success: false,
-      error: 'Invalid password'
-    });
-  }
-  
-  next();
-});
 
 // Các routes (giữ nguyên)
 app.use("/api/bluesky", require("./routes/bluesky"));
