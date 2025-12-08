@@ -86,7 +86,7 @@ app.get("/", (req, res) => {
     success: true,
     author: "Luong Nguyen",
     contact: "https://facebook.com/luonghiii/",
-    message: "Universal Downloader API is running",
+    message: "Hello bro :))",
     endpoints,
   });
 });
