@@ -1,39 +1,63 @@
 const axios = require("axios");
 
 async function fetchYouTubeData(url) {
+  if (!url || typeof url !== "string") {
+    throw new Error("A valid YouTube URL must be provided");
+  }
+
   try {
-    const res = await axios.get(
-      "https://api.vidfly.ai/api/media/youtube/download",
+    const body = new URLSearchParams({
+      auth: "20250901majwlqo",
+      domain: "api-ak.vidssave.com",
+      origin: "cache",
+      link: url,
+    });
+
+    const { data } = await axios.post(
+      "https://api.vidssave.com/api/contentsite_api/media/parse",
+      body.toString(),
       {
-        params: { url },
         headers: {
           accept: "*/*",
-          "content-type": "application/json",
-          "x-app-name": "vidfly-web",
-          "x-app-version": "1.0.0",
-          Referer: "https://vidfly.ai/",
+          "content-type": "application/x-www-form-urlencoded",
+          referer: "https://vidssave.com/",
         },
-      }
+      },
     );
 
-    const data = res.data?.data;
-    if (!data || !data.items || !data.title) {
-      throw new Error("Invalid or empty response from YouTube downloader API");
+    if (!data || data.status !== 1 || !data.data) {
+      throw new Error("Invalid response from vidssave");
     }
 
+    const video = data.data;
+
+    const videos = [];
+    const audios = [];
+
+    (video.resources || []).forEach((r) => {
+      const item = {
+        format: r.format,
+        quality: r.quality || null,
+        url: r.download_url,
+        sizeMB: +(r.size / 1024 / 1024).toFixed(2),
+      };
+
+      if (r.type === "video") videos.push(item);
+      if (r.type === "audio") audios.push(item);
+    });
+
     return {
-      title: data.title,
-      thumbnail: data.cover,
-      duration: data.duration,
-      formats: data.items.map((item) => ({
-        type: item.type,
-        quality: item.label || "unknown",
-        extension: item.ext || item.extension || "unknown",
-        url: item.url,
-      })),
+      type: "video",
+      url,
+      thumbnail: video.thumbnail || null,
+      title: video.title || null,
+      duration: video.duration || null,
+      videos,
+      audios,
     };
   } catch (err) {
-    throw new Error(`YouTube downloader request failed: ${err.message}`);
+    console.error("Vidssave scrape failed:", err.message);
+    throw err;
   }
 }
 
