@@ -1,20 +1,3 @@
-# universalDownloader
-
-[![GitHub stars](https://img.shields.io/github/stars/milancodess/universalDownloader?style=social)](https://github.com/milancodess/universalDownloader/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/milancodess/universalDownloader?style=social)](https://github.com/milancodess/universalDownloader/network/members)
-
-[![Join our Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/qG9cCvEtA3)
-
-A universal media downloader API built with Node.js and Express.  
-Download media from LinkedIn,Threads, Reddit, Facebook, Instagram, TikTok, YouTube, Pinterest, Twitter, Douyin and more — all in one easy-to-use API.
-
----
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=milancodess/universalDownloader&type=Date)](https://www.star-history.com/#milancodess/universalDownloader&Date)
-
----
 
 ## Features
 
@@ -44,15 +27,6 @@ Download media from LinkedIn,Threads, Reddit, Facebook, Instagram, TikTok, YouTu
 
 ---
 
-## Installation
-
-```bash
-git clone https://github.com/milancodess/universalDownloader.git
-cd universalDownloader
-npm install
-```
-
----
 
 ## Usage
 
@@ -124,13 +98,7 @@ Response:
 
 ---
 
-## Contributing
-
-Feel free to open issues or submit pull requests!
-If you want to add support for other platforms or improve error handling, you're welcome!
-
----
 
 ## Author
 
-Milan Bhandari — [GitHub](https://github.com/milancodess)
+Luonghiii — [GitHub](https://github.com/luonghiii)
