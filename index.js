@@ -7,11 +7,16 @@ app.use(express.json());
 app.set("json spaces", 2);
 app.use(morgan("dev"));
 
-// ✅ MIDDLEWARE với Environment Variables & CORS tự chế
+// ✅ MIDDLEWARE xử lý CORS & Bảo mật
 app.use("/api/*", (req, res, next) => {
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['https://module-shadow.vercel.app', 'http://localhost:3000', 'https://luonghiii.id.vn', 'https://taivideo.luonghiii.id.vn'];
+    : [
+        'https://module-shadow.vercel.app', 
+        'http://localhost:3000', 
+        'https://luonghiii.id.vn', 
+        'https://taivideo.luonghiii.id.vn'
+      ];
   
   const origin = req.headers.origin;
   
@@ -19,7 +24,7 @@ app.use("/api/*", (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   } else if (!origin) {
-    // Cho phép các tool như Postman hoặc gọi trực tiếp từ trình duyệt không có origin
+    // Hỗ trợ gọi trực tiếp hoặc dùng Tool test
     res.setHeader('Access-Control-Allow-Origin', '*'); 
   } else {
     return res.status(403).json({ 
@@ -38,7 +43,7 @@ app.use("/api/*", (req, res, next) => {
   next();
 });
 
-// ✅ Danh sách các Routes - Đã thêm Terabox từ code 2
+// ✅ Danh sách các Routes - Cậu nhớ kiểm tra tên file trong folder /routes nhé!
 const routes = {
   "bluesky": "./routes/bluesky",
   "capcut": "./routes/capcut",
@@ -46,13 +51,13 @@ const routes = {
   "douyin": "./routes/douyin",
   "kuaishou": "./routes/kuaishou",
   "linkedin": "./routes/linkedin",
-  "meta": "./routes/facebookInsta",
+  "meta": "./routes/facebookInsta", // File của cậu là facebookInsta.js
   "pinterest": "./routes/pinterest",
   "reddit": "./routes/reddit",
   "snapchat": "./routes/snapchat",
   "spotify": "./routes/spotify",
   "soundcloud": "./routes/soundcloud",
-  "terabox": "./routes/terabox", // <--- Thêm mới từ code 2
+  "terabox": "./routes/terabox",
   "threads": "./routes/threads",
   "tiktok": "./routes/tiktok",
   "tumblr": "./routes/tumblr",
@@ -60,12 +65,16 @@ const routes = {
   "youtube": "./routes/youtube"
 };
 
-// Tự động đăng ký routes để code gọn hơn
+// ✅ Tự động đăng ký routes
 Object.keys(routes).forEach(path => {
-  app.use(`/api/${path}`, require(routes[path]));
+  try {
+    app.use(`/api/${path}`, require(routes[path]));
+  } catch (err) {
+    console.warn(`⚠️ Cảnh báo: Không tìm thấy file hoặc lỗi tại ${routes[path]}`);
+  }
 });
 
-// ✅ Danh sách endpoints để hiển thị ở trang chủ
+// ✅ Lấy danh sách để hiển thị
 const endpoints = Object.keys(routes).map(path => `/api/${path}`);
 
 app.get("/", (req, res) => {
@@ -73,7 +82,7 @@ app.get("/", (req, res) => {
     success: true,
     author: "Nguyễn Xuân Đức Lương",
     contact: "https://facebook.com/luonghiii/",
-    message: "api work rồi đó",
+    message: "API work rồi đó !",
     endpoints,
   });
 });
@@ -82,7 +91,7 @@ app.get("/", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    error: "Endpoint not found",
+    error: "Endpoint không tồn tại!",
   });
 });
 
@@ -91,11 +100,11 @@ app.use((err, req, res, next) => {
   console.error("❌ Error:", err.message);
   res.status(500).json({
     success: false,
-    error: "Internal Server Error",
+    error: "Lỗi hệ thống rồi bro ơi!",
   });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server của Lương đang chạy tại cổng ${PORT}`);
 });
