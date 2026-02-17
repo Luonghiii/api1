@@ -81,7 +81,6 @@ Response:
 | `/api/twitter/download`     | Download Twitter media            | GET    |
 | `/api/youtube/download`     | Download YouTube media            | GET    |
 
-**~~See the full interactive API docs with Swagger at `/api-docs`.~~**
 
 ---
 
