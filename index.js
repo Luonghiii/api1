@@ -1,4 +1,3 @@
-// index.js
 const express = require("express");
 const morgan = require("morgan");
 
@@ -8,12 +7,11 @@ app.use(express.json());
 app.set("json spaces", 2);
 app.use(morgan("dev"));
 
-// ✅ MIDDLEWARE với Environment Variables
+// ✅ MIDDLEWARE với Environment Variables & CORS tự chế
 app.use("/api/*", (req, res, next) => {
-  // 1. CORS - Lấy từ environment variable
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['https://module-shadow.vercel.app', 'http://localhost:3000', 'https://luonghiii.id.vn'];
+    : ['https://module-shadow.vercel.app', 'http://localhost:3000', 'https://luonghiii.id.vn', 'https://taivideo.luonghiii.id.vn'];
   
   const origin = req.headers.origin;
   
@@ -21,10 +19,8 @@ app.use("/api/*", (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   } else if (!origin) {
-    return res.status(403).json({ 
-      success: false,
-      error: 'Access denied - No origin header'
-    });
+    // Cho phép các tool như Postman hoặc gọi trực tiếp từ trình duyệt không có origin
+    res.setHeader('Access-Control-Allow-Origin', '*'); 
   } else {
     return res.status(403).json({ 
       success: false,
@@ -42,55 +38,47 @@ app.use("/api/*", (req, res, next) => {
   next();
 });
 
-// Các routes (giữ nguyên)
-app.use("/api/bluesky", require("./routes/bluesky"));
-app.use("/api/capcut", require("./routes/capcut"));
-app.use("/api/dailymotion", require("./routes/dailymotion"));
-app.use("/api/douyin", require("./routes/douyin"));
-app.use("/api/kuaishou", require("./routes/kuaishou"));
-app.use("/api/linkedin", require("./routes/linkedin"));
-app.use("/api/meta", require("./routes/facebookInsta"));
-app.use("/api/pinterest", require("./routes/pinterest"));
-app.use("/api/reddit", require("./routes/reddit"));
-app.use("/api/spotify", require("./routes/spotify"));
-app.use("/api/snapchat", require("./routes/snapchat"));
-app.use("/api/soundcloud", require("./routes/soundcloud"));
-app.use("/api/threads", require("./routes/threads"));
-app.use("/api/tiktok", require("./routes/tiktok"));
-app.use("/api/tumblr", require("./routes/tumblr"));
-app.use("/api/twitter", require("./routes/twitter"));
-app.use("/api/youtube", require("./routes/youtube"));
+// ✅ Danh sách các Routes - Đã thêm Terabox từ code 2
+const routes = {
+  "bluesky": "./routes/bluesky",
+  "capcut": "./routes/capcut",
+  "dailymotion": "./routes/dailymotion",
+  "douyin": "./routes/douyin",
+  "kuaishou": "./routes/kuaishou",
+  "linkedin": "./routes/linkedin",
+  "meta": "./routes/facebookInsta",
+  "pinterest": "./routes/pinterest",
+  "reddit": "./routes/reddit",
+  "snapchat": "./routes/snapchat",
+  "spotify": "./routes/spotify",
+  "soundcloud": "./routes/soundcloud",
+  "terabox": "./routes/terabox", // <--- Thêm mới từ code 2
+  "threads": "./routes/threads",
+  "tiktok": "./routes/tiktok",
+  "tumblr": "./routes/tumblr",
+  "twitter": "./routes/twitter",
+  "youtube": "./routes/youtube"
+};
 
-const endpoints = [
-  "/api/bluesky",
-  "/api/capcut",
-  "/api/dailymotion",
-  "/api/douyin",
-  "/api/kuaishou",
-  "/api/linkedin",
-  "/api/meta",
-  "/api/pinterest",
-  "/api/reddit",
-  "/api/snapchat",
-  "/api/spotify",
-  "/api/soundcloud",
-  "/api/threads",
-  "/api/tiktok",
-  "/api/tumblr",
-  "/api/twitter",
-  "/api/youtube",
-];
+// Tự động đăng ký routes để code gọn hơn
+Object.keys(routes).forEach(path => {
+  app.use(`/api/${path}`, require(routes[path]));
+});
+
+// ✅ Danh sách endpoints để hiển thị ở trang chủ
+const endpoints = Object.keys(routes).map(path => `/api/${path}`);
 
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    author: "Luong Nguyen",
+    author: "Nguyễn Xuân Đức Lương",
     contact: "https://facebook.com/luonghiii/",
-    message: "Hello bro :))",
+    message: "api work rồi đó",
     endpoints,
   });
 });
 
+// Handling 404
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -98,6 +86,7 @@ app.use((req, res) => {
   });
 });
 
+// Error Handler
 app.use((err, req, res, next) => {
   console.error("❌ Error:", err.message);
   res.status(500).json({
